@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Indico-Emotion</string>
+    <string name="hello_world">You are sad. Be happy instead!</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
