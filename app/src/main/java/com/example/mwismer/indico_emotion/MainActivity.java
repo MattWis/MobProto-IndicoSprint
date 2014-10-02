@@ -1,8 +1,6 @@
 package com.example.mwismer.indico_emotion;
 
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,6 +38,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.view.Menu;
+import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
