@@ -5,4 +5,7 @@
     <string name="hello_world">You are sad. Be happy instead!</string>
     <string name="action_settings">Settings</string>
 
+    <string name="main_button">Enter</string>
+    <string name="main_input_entry_hint">Text here</string>
+
 </resources>
