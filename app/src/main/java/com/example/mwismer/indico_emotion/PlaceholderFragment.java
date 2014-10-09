@@ -1,7 +1,9 @@
 package com.example.mwismer.indico_emotion;
 
+import com.google.gson.Gson;
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +20,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.Button;
 import android.widget.ImageView;
-
 
 /**
  * A placeholder fragment containing a simple view.
@@ -67,22 +68,10 @@ public class PlaceholderFragment extends Fragment {
                 stream = getActivity().getContentResolver().openInputStream(data.getData());
                 bitmap = BitmapFactory.decodeStream(stream);
 
-                // 4096 x 4096 is the biggest image we can display
-                // It errors if you try to crop an image to larger than it's size
-                if (bitmap.getWidth() > 4096 || bitmap.getHeight() > 4096) {
-                    int width = 4096;
-                    int height = 4096;
-                    if (bitmap.getWidth() < 4096) {
-                        width = bitmap.getWidth();
-                    }
-                    if (bitmap.getHeight() < 4096) {
-                        height = bitmap.getHeight();
-                    }
+                // Making it square squashes the dimensions oddly. Source of error?
+                bitmap = Bitmap.createScaledBitmap(bitmap, 48, 48, false);
 
-                    imageView.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, width, height));
-                } else {
-                    imageView.setImageBitmap(bitmap);
-                }
+                imageView.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } finally {
@@ -94,6 +83,31 @@ public class PlaceholderFragment extends Fragment {
                     }
                 }
             }
+            Log.d("SUP", "why oh why");
+
+            int[] pixels = new int[(48 * 48)];
+            bitmap.getPixels(pixels, 0, 48, 0, 0, 48, 48);
+
+            Log.d("SUP", toGrayscaleJSON(bitmap));
         }
+    }
+
+    public String toGrayscaleJSON(Bitmap img) {
+        int w = img.getWidth();
+        int h = img.getHeight();
+
+        int[] pixels = new int[w * h];
+        bitmap.getPixels(pixels, 0, w, 0, 0, w, h);
+
+        double[][] oddGrayscale = new double[w][h];
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                int pixel = pixels[i * w + j];
+                double gray = 0.299 * Color.red(pixel) + 0.587 * Color.green(pixel) + 0.114 * Color.blue(pixel);
+                oddGrayscale[i][j] = 1 / gray;
+            }
+        }
+
+        return (new Gson()).toJson(oddGrayscale);
     }
 }
