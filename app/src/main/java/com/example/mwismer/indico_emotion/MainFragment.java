@@ -74,14 +74,12 @@ public class MainFragment extends Fragment {
     }
 
 
-    public void postJson(String inputStr) {
-        final String URL = "http://api.indico.io/political";
-//        final String URL = "http://api.indico.io/fer";
+    public void postJson(double[][] grayScale) {
+        final String URL = "http://api.indico.io/fer";
 //      Post params to be sent to the server
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, double[][]> params = new HashMap<String, double[][]>();
 
-        params.put("text", inputStr);
-
+        params.put("face", grayScale);
         JsonObjectRequest req = new JsonObjectRequest(
                 URL,
                 new JSONObject(params),
@@ -125,7 +123,6 @@ public class MainFragment extends Fragment {
                     Toast.makeText(context, "You didn't type anything in!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                postJson(input.getText().toString());
                 input.setText("");
             }
         };
@@ -160,16 +157,11 @@ public class MainFragment extends Fragment {
                     }
                 }
             }
-            Log.d("SUP", "why oh why");
-
-            int[] pixels = new int[(48 * 48)];
-            bitmap.getPixels(pixels, 0, 48, 0, 0, 48, 48);
-
-            Log.d("SUP", toGrayscaleJSON(bitmap));
+            postJson(toGrayscale(bitmap));
         }
     }
 
-    public String toGrayscaleJSON(Bitmap img) {
+    public double[][] toGrayscale(Bitmap img) {
         int w = img.getWidth();
         int h = img.getHeight();
 
@@ -185,6 +177,6 @@ public class MainFragment extends Fragment {
             }
         }
 
-        return (new Gson()).toJson(oddGrayscale);
+        return oddGrayscale;
     }
 }
