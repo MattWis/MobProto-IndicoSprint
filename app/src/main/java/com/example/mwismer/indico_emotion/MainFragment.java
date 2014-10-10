@@ -50,7 +50,6 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        setupViews();
 
         imageView = (ImageView) rootView.findViewById(R.id.result);
 
@@ -78,7 +77,7 @@ public class MainFragment extends Fragment {
 
     public void postJson(double[][] grayScale) {
         final String URL = "http://api.indico.io/fer";
-//      Post params to be sent to the server
+        //Post params to be sent to the server
         HashMap<String, double[][]> params = new HashMap<String, double[][]>();
 
         params.put("face", grayScale);
@@ -107,33 +106,9 @@ public class MainFragment extends Fragment {
         ApplicationController.getInstance().addToRequestQueue(req);
     }
 
-    private void setupViews() {
-        Button sendButton = (Button) rootView.findViewById(R.id.main_input_button);
-        Log.i(MainActivity.class.getSimpleName(), "Made it here");
-        sendButton.setOnClickListener(sendButtonListener());
-        Log.i(MainActivity.class.getSimpleName(), "Made it there");
-    }
-
-    public View.OnClickListener sendButtonListener(){
-        Log.i(MainActivity.class.getSimpleName(), "In sendButtonListener");
-        // stuff to do when button is clicked
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EditText input = ((EditText) rootView.findViewById(R.id.main_input_entry));
-                if (input.getText().toString().equals("")){
-                    Toast.makeText(context, "You didn't type anything in!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                input.setText("");
-            }
-        };
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("HI", "Activity :" + imageView);
         InputStream stream = null;
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             try {
