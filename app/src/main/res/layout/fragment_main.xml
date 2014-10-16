@@ -9,11 +9,7 @@
     tools:context=".MainActivity$PlaceholderFragment">
 
 
-    <SurfaceView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:id="@+id/picBox"
-        />
+
 
     <VideoView
         android:id="@+id/myVideo"
@@ -30,4 +26,11 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
+    <SurfaceView
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/picBox"
+        />
 </RelativeLayout>
