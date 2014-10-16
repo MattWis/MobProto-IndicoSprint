@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.android.volley.Response;
@@ -45,6 +46,7 @@ import java.util.TimerTask;
 public class MainFragment extends Fragment {
     private static final int REQUEST_CODE = 1;
     private Bitmap bitmap;
+    static TextView emotion;
     Camera mCamera;
     Timer timer;
 
@@ -61,7 +63,7 @@ public class MainFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         vidView = (VideoView) rootView.findViewById(R.id.myVideo);
-
+        emotion = (TextView) rootView.findViewById(R.id.emotion);
 
         /** CAMERA CODE **/
         mCamera = Camera.open(1);
@@ -191,6 +193,8 @@ public class MainFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             Log.i("DebugDebug", "Got return from indico");
+                            emotion.setText(getHighestEmotion(response));
+
                             Log.i(MainActivity.class.getSimpleName(), response.toString(4));
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -207,6 +211,41 @@ public class MainFragment extends Fragment {
 
 //      add the request object to the queue to be executed
         ApplicationController.getInstance().addToRequestQueue(req);
+    }
+
+    private static HashMap<String, String> h = new HashMap<String, String>(){{
+        put("Angry", "Angry");
+        put("Fear", "Fear");
+        put("Happy", "Happy");
+        put("Neutral", "Neutral");
+        put("Sad", "Sad");
+        put("Surprise", "Surprise");
+    }};
+
+    public static String getHighestEmotion(final JSONObject response) {
+        double highestVal = 0;
+        double currentVal = 0;
+        String highest = "";
+        for (String key : h.keySet()) {
+            try {
+                currentVal = response.getDouble(key);
+                if (key.equals("Sad")) {
+                    currentVal /= 10;
+                }
+
+                if (key.equals("Fear")) {
+                    currentVal /= 5;
+                }
+                if (currentVal > highestVal) {
+                    highestVal = currentVal;
+                    highest = key;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return highest;
     }
 
     public double[][] toGrayscale(Bitmap img) {

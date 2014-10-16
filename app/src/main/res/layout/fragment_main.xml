@@ -26,6 +26,15 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
+    <TextView
+        android:id="@+id/emotion"
+        android:text="No emotion yet"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/play"
+        android:paddingBottom="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <SurfaceView
         android:layout_width="1dp"
         android:layout_height="1dp"
