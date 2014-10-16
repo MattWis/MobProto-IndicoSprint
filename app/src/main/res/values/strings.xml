@@ -3,6 +3,7 @@
 
     <string name="app_name">Emotify Me</string>
     <string name="intro_text">Emotify Yourself!</string>
+    <string name="picture">Take a picture</string>
     <string name="action_settings">Settings</string>
     <string name="main_button">Enter</string>
     <string name="main_input_entry_hint">Text here</string>
