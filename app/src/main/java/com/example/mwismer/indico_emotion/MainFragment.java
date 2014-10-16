@@ -104,9 +104,7 @@ public class MainFragment extends Fragment {
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         try {
-                            Log.i("DebugDebug", "here");
                             if (!holder.isCreating()) {
-                                Log.i("DebugDebug", "is not creating");
                                 takephoto();
                             }
                         } catch (IOException e) {
@@ -135,23 +133,23 @@ public class MainFragment extends Fragment {
     }
 
     private void takephoto() throws IOException {
-        mCamera.takePicture(new Camera.ShutterCallback() {
-            @Override
-            public void onShutter() {
-
-            }
-        }, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-                Log.i("DebugDebug", "I'm taking a picture");
+        mCamera.takePicture(
+            null, null, null,
+            new Camera.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] bytes, Camera camera) {
                 mCamera.startPreview();
+                Log.i("DebugDebug", "Preview");
+                if (bytes != null) {
+                    Log.i("DebugDebug", bytes.length + "");
+
+                    postJsonWithBytes(bytes);
+                    Log.i("DebugDebug", "Done posting");
+                } else {
+                     Log.i("DebugDebug", "Null bytes?");
+                }
             }
-        }, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-                Log.i("DebugDebug", "I took a picture");
-            }
-        });
+                     });
     }
 
     @Override
@@ -172,6 +170,11 @@ public class MainFragment extends Fragment {
         super.onAttach(activity);
     }
 
+    public void postJsonWithBytes(byte[] bytes) {
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        bitmap = Bitmap.createScaledBitmap(bitmap, 48, 48, false);
+        postJson(toGrayscale(bitmap));
+    }
 
     public static void postJson(double[][] grayScale) {
         final String URL = "http://api.indico.io/fer";
@@ -179,6 +182,8 @@ public class MainFragment extends Fragment {
         HashMap<String, double[][]> params = new HashMap<String, double[][]>();
 
         params.put("face", grayScale);
+
+        Log.i("DebugDebug", "Sending to indico");
         JsonObjectRequest req = new JsonObjectRequest(
                 URL,
                 new JSONObject(params),
@@ -186,6 +191,7 @@ public class MainFragment extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            Log.i("DebugDebug", "Got return from indico");
                             Log.i(MainActivity.class.getSimpleName(), response.toString(4));
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -241,7 +247,7 @@ public class MainFragment extends Fragment {
         int h = img.getHeight();
 
         int[] pixels = new int[w * h];
-        bitmap.getPixels(pixels, 0, w, 0, 0, w, h);
+        img.getPixels(pixels, 0, w, 0, 0, w, h);
 
         double[][] oddGrayscale = new double[w][h];
         for (int i = 0; i < w; i++) {
