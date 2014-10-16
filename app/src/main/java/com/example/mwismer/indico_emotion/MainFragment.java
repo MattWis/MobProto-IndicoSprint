@@ -7,22 +7,25 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.hardware.Camera;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +34,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by alexadkins on 10/6/14.
@@ -40,29 +45,65 @@ public class MainFragment extends Fragment {
     private static final int REQUEST_CODE = 1;
     private Bitmap bitmap;
     private ImageView imageView;
+    Camera mCamera;
 
     public MainFragment() {
     }
 
     View rootView;
+    VideoView vidView;
     Context context;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        imageView = (ImageView) rootView.findViewById(R.id.result);
+        vidView = (VideoView) rootView.findViewById(R.id.myVideo);
 
-        final Button cam = (Button) rootView.findViewById(R.id.camera);
-        cam.setOnClickListener(new View.OnClickListener() {
+        mCamera = getCameraInstance(1);
+        Camera.Parameters Params = mCamera.getParameters();
+//        CameraPreview prev = new CameraPreview(getActivity(), mCamera);
+        SurfaceView layout = (SurfaceView) rootView.findViewById(R.id.picBox);
+        try {
+            mCamera.setPreviewDisplay(layout.getHolder());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mCamera.startPreview();
+
+        String vidAddress = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
+        Uri vidUri = Uri.parse(vidAddress);
+        vidView.setVideoURI(vidUri);
+        rootView.findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                    startActivityForResult(intent, REQUEST_CODE);
-                } else {
-                    Log.d(MainActivity.class.getSimpleName(), "Nulls in the places");
-                }
+                vidView.start();
+                Timer timer = new Timer();
+                TimerTask task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        new AsyncTask<Void, Void, Void>() {
+
+                            @Override
+                            protected Void doInBackground(Void... voids) {
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                try {
+                                    takephoto();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }.execute();
+
+                    }
+                };
+                timer.schedule(task, 0, 5000);
+
             }
         });
         return rootView;
@@ -156,4 +197,120 @@ public class MainFragment extends Fragment {
 
         return oddGrayscale;
     }
+
+    public class CameraPreview extends SurfaceView implements
+            SurfaceHolder.Callback {
+        private static final String TAG = "Camera Preview";
+        private SurfaceHolder mHolder;
+        public Camera mCamera;
+
+        @SuppressWarnings("deprecation")
+        public CameraPreview(Context context, Camera camera) {
+            super(context);
+            mCamera = camera;
+            mCamera.setDisplayOrientation(90);
+
+            // Install a SurfaceHolder.Callback so we get notified when the
+            // underlying surface is created and destroyed.
+            mHolder = getHolder();
+            mHolder.addCallback(this);
+            // deprecated setting, but required on Android versions prior to 3.0
+            mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        }
+
+        public void surfaceCreated(SurfaceHolder holder) {
+            // The Surface has been created, now tell the camera where to draw the
+            // preview.
+            try {
+                mCamera.setPreviewDisplay(holder);
+                mCamera.setDisplayOrientation(90);
+                mCamera.startPreview();
+
+            } catch (IOException e) {
+                Log.d(TAG, "Error setting camera preview: " + e.getMessage());
+            }
+        }
+
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            // empty. Take care of releasing the Camera preview in your activity.
+        }
+
+        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+            // If your preview can change or rotate, take care of those events here.
+            // Make sure to stop the preview before resizing or reformatting it.
+            if (mHolder.getSurface() == null) {
+                // preview surface does not exist
+                return;
+            }
+
+            // stop preview before making changes
+            try {
+                mCamera.stopPreview();
+            } catch (Exception e) {
+                // ignore: tried to stop a non-existent preview
+            }
+
+            // set preview size and make any resize, rotate or
+            // reformatting changes here
+
+            // start preview with new settings
+            try {
+                mCamera.setPreviewDisplay(mHolder);
+                mCamera.startPreview();
+            } catch (Exception e) {
+                Log.d(TAG, "Error starting camera preview: " + e.getMessage());
+            }
+        }
+    }
+
+    private void takephoto() throws IOException {
+        mCamera.takePicture(new Camera.ShutterCallback() {
+            @Override
+            public void onShutter() {
+
+            }
+        }, new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes, Camera camera) {
+
+            }
+        }, new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes, Camera camera) {
+                Log.i("DebugDebug", "I took a picture");
+                mCamera.release();
+            }
+        });
+
+//        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+//            startActivityForResult(intent, REQUEST_CODE);
+//        } else {
+//            Log.d(MainActivity.class.getSimpleName(), "Nulls in the places");
+//        }
+    }
+
+    /** A safe way to get an instance of the Camera object. */
+    public static Camera getCameraInstance(int cameraId) {
+        Camera c = null;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+                c = Camera.open(cameraId);
+            } else {
+                c = Camera.open();
+            }
+        } catch (Exception e) {
+            c = null;
+        }
+        return c; // returns null if camera is unavailable
+    }
+
+    private void releaseCamera() {
+        if (mCamera != null) {
+            mCamera.release(); // release the camera for other applications
+            mCamera = null;
+        }
+    }
 }
+
+

@@ -7,5 +7,6 @@
 
     <string name="main_button">Enter</string>
     <string name="main_input_entry_hint">Text here</string>
+    <string name="play">Play Movie</string>
 
 </resources>
