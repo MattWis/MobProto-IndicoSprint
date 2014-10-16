@@ -18,6 +18,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.VideoView;
@@ -120,12 +121,14 @@ public class MainFragment extends Fragment {
         String vidAddress = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
         Uri vidUri = Uri.parse(vidAddress);
         vidView.setVideoURI(vidUri);
-        rootView.findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
+        final Button play = (Button) rootView.findViewById(R.id.play);
+        play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                play.setVisibility(View.GONE);
                 vidView.start();
 
-                timer.schedule(task, 0, 5000);
+                timer.schedule(task, 5000, 5000);
 
             }
         });
