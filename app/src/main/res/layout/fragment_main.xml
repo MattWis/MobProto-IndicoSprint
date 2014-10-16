@@ -14,6 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
         android:textSize="40dp" />
 
     <!--<ImageView-->
@@ -81,6 +82,33 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textSize="40dp"/>
+
+    <!--<ImageView-->
+    <!--android:contentDescription="result"-->
+    <!--android:id="@+id/result"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_centerInParent="true"-->
+    <!--android:layout_alignParentBottom="true"/>-->
+
+    <ImageView
+        android:contentDescription="result"
+        android:id="@+id/result"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"/>
+
+    <ImageView
+        android:id="@+id/emoticon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"/>
+
+
+
+
 
     <!--mImageView.setRotation(angle)-->
 </RelativeLayout>

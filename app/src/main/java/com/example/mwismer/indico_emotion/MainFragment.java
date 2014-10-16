@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -14,15 +15,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,8 +37,18 @@ import java.util.HashMap;
 public class MainFragment extends Fragment {
     private static final int REQUEST_CODE = 1;
     private Bitmap bitmap;
-//    private ImageView imageView;
+    private ImageView imageView;
 //    private ImageView happyImage
+
+    private HashMap<String, Integer> h = new HashMap<String, Integer>(){{
+        put("Angry", R.drawable.ic_angry);
+        put("Fear", R.drawable.ic_fear);
+        put("Happy", R.drawable.ic_happy);
+//        h.put("Launcher", R.drawable.ic_launcher);
+        put("Neutral", R.drawable.ic_neutral);
+        put("Sad", R.drawable.ic_sad);
+        put("Surprise", R.drawable.ic_surprise);
+    }};
 
     public MainFragment() {
     }
@@ -52,7 +60,7 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-//        imageView = (ImageView) rootView.findViewById(R.id.result);
+        imageView = (ImageView) rootView.findViewById(R.id.result);
 //        happyImage = (ImageView) rootView.findViewById(R.id.happy);
 //        happyImage.setImageResource(R.drawable.ic_happy);
 
@@ -78,6 +86,32 @@ public class MainFragment extends Fragment {
         super.onAttach(activity);
     }
 
+    public String getHighestEmotion(final JSONObject response) {
+        double highestVal = 0;
+        double currentVal = 0;
+        String highest = "";
+        for (String key : h.keySet()) {
+            try {
+                currentVal = response.getDouble(key);
+                if (key.equals("Sad")) {
+                    currentVal /= 10;
+                }
+
+                if (key.equals("Fear")) {
+                    currentVal /= 5;
+                }
+                if (currentVal > highestVal) {
+                    highestVal = currentVal;
+                    highest = key;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return highest;
+    }
+
 
     public void postJson(double[][] grayScale) {
         final String URL = "http://api.indico.io/fer";
@@ -93,6 +127,9 @@ public class MainFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             Log.i(MainActivity.class.getSimpleName(), response.toString(4));
+                            Log.i(MainActivity.class.getSimpleName(), response.getString("Happy"));
+                            imageView.setImageResource(h.get(getHighestEmotion(response)));
+//                            RelativeLayout.removeView());
 //                            ((MainActivity) getActivity()).switchFragment(new ImageDisplay());
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -123,9 +160,15 @@ public class MainFragment extends Fragment {
                 }
                 stream = getActivity().getContentResolver().openInputStream(data.getData());
                 bitmap = BitmapFactory.decodeStream(stream);
+                BitmapDrawable ob = new BitmapDrawable(bitmap);
+//                imageView.setImageBitmap(bitmap);
+                imageView.setRotation(90);
+                imageView.setBackgroundDrawable(ob);
+                imageView.setRotation(-90);
 
                 // Making it square squashes the dimensions oddly. Source of error?
-                bitmap = Bitmap.createScaledBitmap(bitmap, 48, 48, false);
+                bitmap = Bitmap.createScaledBitmap(bitmap, 48, 86, false);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 19, 48, 48, null, false);
 
 //                imageView.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
@@ -148,7 +191,7 @@ public class MainFragment extends Fragment {
         int h = img.getHeight();
 
         int[] pixels = new int[w * h];
-        bitmap.getPixels(pixels, 0, w, 0, 0, w, h);
+        img.getPixels(pixels, 0, w, 0, 0, w, h);
 
         double[][] oddGrayscale = new double[w][h];
         for (int i = 0; i < w; i++) {
