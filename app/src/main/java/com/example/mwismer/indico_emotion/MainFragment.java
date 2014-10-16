@@ -170,7 +170,8 @@ public class MainFragment extends Fragment {
 
     public void postJsonWithBytes(byte[] bytes) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        bitmap = Bitmap.createScaledBitmap(bitmap, 48, 48, false);
+        bitmap = Bitmap.createScaledBitmap(bitmap, 48, 86, false);
+        bitmap = Bitmap.createBitmap(bitmap, 0, 19, 48, 48, null, false);
         postJson(toGrayscale(bitmap));
     }
 
