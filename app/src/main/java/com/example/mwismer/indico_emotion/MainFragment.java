@@ -46,6 +46,7 @@ public class MainFragment extends Fragment {
     private Bitmap bitmap;
     private ImageView imageView;
     Camera mCamera;
+    Timer timer;
 
     public MainFragment() {
     }
@@ -61,16 +62,62 @@ public class MainFragment extends Fragment {
 
         vidView = (VideoView) rootView.findViewById(R.id.myVideo);
 
-        mCamera = getCameraInstance(1);
+
+        /** CAMERA CODE **/
+        mCamera = Camera.open(1);
         Camera.Parameters Params = mCamera.getParameters();
-//        CameraPreview prev = new CameraPreview(getActivity(), mCamera);
         SurfaceView layout = (SurfaceView) rootView.findViewById(R.id.picBox);
-        try {
-            mCamera.setPreviewDisplay(layout.getHolder());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mCamera.startPreview();
+        final SurfaceHolder holder = layout.getHolder();
+        holder.addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                try {
+                    mCamera.setPreviewDisplay(surfaceHolder);
+                    mCamera.startPreview();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+            }
+        });
+
+        timer = new Timer();
+        final TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                new AsyncTask<Void, Void, Void>() {
+
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        try {
+                            Log.i("DebugDebug", "here");
+                            if (!holder.isCreating()) {
+                                Log.i("DebugDebug", "is not creating");
+                                takephoto();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.execute();
+
+            }
+        };
+
 
         String vidAddress = "https://archive.org/download/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
         Uri vidUri = Uri.parse(vidAddress);
@@ -79,34 +126,44 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 vidView.start();
-                Timer timer = new Timer();
-                TimerTask task = new TimerTask() {
-                    @Override
-                    public void run() {
-                        new AsyncTask<Void, Void, Void>() {
 
-                            @Override
-                            protected Void doInBackground(Void... voids) {
-                                return null;
-                            }
-
-                            @Override
-                            protected void onPostExecute(Void aVoid) {
-                                try {
-                                    takephoto();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }.execute();
-
-                    }
-                };
                 timer.schedule(task, 0, 5000);
 
             }
         });
         return rootView;
+    }
+
+    private void takephoto() throws IOException {
+        mCamera.takePicture(new Camera.ShutterCallback() {
+            @Override
+            public void onShutter() {
+
+            }
+        }, new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes, Camera camera) {
+                Log.i("DebugDebug", "I'm taking a picture");
+                mCamera.startPreview();
+            }
+        }, new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes, Camera camera) {
+                Log.i("DebugDebug", "I took a picture");
+            }
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (timer != null) {
+            timer.cancel();
+        }
+
+        if (mCamera != null) {
+            mCamera.release();
+        }
     }
 
     @Override
@@ -116,7 +173,7 @@ public class MainFragment extends Fragment {
     }
 
 
-    public void postJson(double[][] grayScale) {
+    public static void postJson(double[][] grayScale) {
         final String URL = "http://api.indico.io/fer";
         //Post params to be sent to the server
         HashMap<String, double[][]> params = new HashMap<String, double[][]>();
@@ -196,120 +253,6 @@ public class MainFragment extends Fragment {
         }
 
         return oddGrayscale;
-    }
-
-    public class CameraPreview extends SurfaceView implements
-            SurfaceHolder.Callback {
-        private static final String TAG = "Camera Preview";
-        private SurfaceHolder mHolder;
-        public Camera mCamera;
-
-        @SuppressWarnings("deprecation")
-        public CameraPreview(Context context, Camera camera) {
-            super(context);
-            mCamera = camera;
-            mCamera.setDisplayOrientation(90);
-
-            // Install a SurfaceHolder.Callback so we get notified when the
-            // underlying surface is created and destroyed.
-            mHolder = getHolder();
-            mHolder.addCallback(this);
-            // deprecated setting, but required on Android versions prior to 3.0
-            mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        }
-
-        public void surfaceCreated(SurfaceHolder holder) {
-            // The Surface has been created, now tell the camera where to draw the
-            // preview.
-            try {
-                mCamera.setPreviewDisplay(holder);
-                mCamera.setDisplayOrientation(90);
-                mCamera.startPreview();
-
-            } catch (IOException e) {
-                Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-            }
-        }
-
-        public void surfaceDestroyed(SurfaceHolder holder) {
-            // empty. Take care of releasing the Camera preview in your activity.
-        }
-
-        public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-            // If your preview can change or rotate, take care of those events here.
-            // Make sure to stop the preview before resizing or reformatting it.
-            if (mHolder.getSurface() == null) {
-                // preview surface does not exist
-                return;
-            }
-
-            // stop preview before making changes
-            try {
-                mCamera.stopPreview();
-            } catch (Exception e) {
-                // ignore: tried to stop a non-existent preview
-            }
-
-            // set preview size and make any resize, rotate or
-            // reformatting changes here
-
-            // start preview with new settings
-            try {
-                mCamera.setPreviewDisplay(mHolder);
-                mCamera.startPreview();
-            } catch (Exception e) {
-                Log.d(TAG, "Error starting camera preview: " + e.getMessage());
-            }
-        }
-    }
-
-    private void takephoto() throws IOException {
-        mCamera.takePicture(new Camera.ShutterCallback() {
-            @Override
-            public void onShutter() {
-
-            }
-        }, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-
-            }
-        }, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
-                Log.i("DebugDebug", "I took a picture");
-                mCamera.release();
-            }
-        });
-
-//        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-//            startActivityForResult(intent, REQUEST_CODE);
-//        } else {
-//            Log.d(MainActivity.class.getSimpleName(), "Nulls in the places");
-//        }
-    }
-
-    /** A safe way to get an instance of the Camera object. */
-    public static Camera getCameraInstance(int cameraId) {
-        Camera c = null;
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-                c = Camera.open(cameraId);
-            } else {
-                c = Camera.open();
-            }
-        } catch (Exception e) {
-            c = null;
-        }
-        return c; // returns null if camera is unavailable
-    }
-
-    private void releaseCamera() {
-        if (mCamera != null) {
-            mCamera.release(); // release the camera for other applications
-            mCamera = null;
-        }
     }
 }
 
