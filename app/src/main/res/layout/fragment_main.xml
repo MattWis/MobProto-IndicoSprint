@@ -9,21 +9,78 @@
     tools:context=".MainActivity$PlaceholderFragment">
 
     <TextView
-        android:text="@string/hello_world"
+        android:text="@string/intro_text"
         android:id="@+id/text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="40dp" />
+
+    <!--<ImageView-->
+        <!--android:contentDescription="happyEmoticon"-->
+        <!--android:id="@+id/happy"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:src="@drawable/ic_happy"/>-->
+
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:weightSum="2">-->
+
+        <!--<ImageView-->
+            <!--android:contentDescription="happyEmoticon"-->
+            <!--android:id="@+id/happy"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:src="@drawable/ic_happy"/>-->
+
+        <!--<ImageView-->
+            <!--android:contentDescription="sadEmoticon"-->
+            <!--android:id="@+id/sad"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:src="@drawable/ic_sad"/>-->
+
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:weightSum="2">-->
+        <!--<ImageView-->
+            <!--android:contentDescription="angryEmoticon"-->
+            <!--android:id="@+id/angry"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:src="@drawable/ic_angry"/>-->
+
+    <!--</LinearLayout>-->
+
+
+
+
+    <!--<ImageView-->
+        <!--android:contentDescription="happyEmoticon"-->
+        <!--android:id="@+id/happy"-->
+        <!--android:layout_width="60dp"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:src="@drawable/ic_happy"/>-->
+
 
     <Button
         android:id="@+id/camera"
-        android:text="Camera"
+        android:text="TRY IT"
         android:layout_below="@id/text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="40dp"/>
 
-    <ImageView
-        android:contentDescription="Sup"
-        android:id="@+id/result"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+    <!--mImageView.setRotation(angle)-->
 </RelativeLayout>

@@ -39,7 +39,8 @@ import java.util.HashMap;
 public class MainFragment extends Fragment {
     private static final int REQUEST_CODE = 1;
     private Bitmap bitmap;
-    private ImageView imageView;
+//    private ImageView imageView;
+//    private ImageView happyImage
 
     public MainFragment() {
     }
@@ -51,7 +52,10 @@ public class MainFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        imageView = (ImageView) rootView.findViewById(R.id.result);
+//        imageView = (ImageView) rootView.findViewById(R.id.result);
+//        happyImage = (ImageView) rootView.findViewById(R.id.happy);
+//        happyImage.setImageResource(R.drawable.ic_happy);
+
 
         final Button cam = (Button) rootView.findViewById(R.id.camera);
         cam.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +93,7 @@ public class MainFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             Log.i(MainActivity.class.getSimpleName(), response.toString(4));
+//                            ((MainActivity) getActivity()).switchFragment(new ImageDisplay());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -122,7 +127,7 @@ public class MainFragment extends Fragment {
                 // Making it square squashes the dimensions oddly. Source of error?
                 bitmap = Bitmap.createScaledBitmap(bitmap, 48, 48, false);
 
-                imageView.setImageBitmap(bitmap);
+//                imageView.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } finally {

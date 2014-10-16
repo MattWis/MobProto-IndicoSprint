@@ -1,6 +1,7 @@
 package com.example.mwismer.indico_emotion;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,6 +56,10 @@ public class MainActivity extends Activity {
                     .commit();
         }
     }
+
+//    public void switchFragment(Fragment fragment) {
+//    getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
+//}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
