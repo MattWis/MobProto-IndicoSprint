@@ -45,7 +45,6 @@ import java.util.TimerTask;
 public class MainFragment extends Fragment {
     private static final int REQUEST_CODE = 1;
     private Bitmap bitmap;
-    private ImageView imageView;
     Camera mCamera;
     Timer timer;
 
@@ -66,7 +65,6 @@ public class MainFragment extends Fragment {
 
         /** CAMERA CODE **/
         mCamera = Camera.open(1);
-        Camera.Parameters Params = mCamera.getParameters();
         SurfaceView layout = (SurfaceView) rootView.findViewById(R.id.picBox);
         final SurfaceHolder holder = layout.getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
@@ -82,12 +80,10 @@ public class MainFragment extends Fragment {
 
             @Override
             public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
             }
         });
 
@@ -113,7 +109,6 @@ public class MainFragment extends Fragment {
                         }
                     }
                 }.execute();
-
             }
         };
 
@@ -211,38 +206,6 @@ public class MainFragment extends Fragment {
 
 //      add the request object to the queue to be executed
         ApplicationController.getInstance().addToRequestQueue(req);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        InputStream stream = null;
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            try {
-                // recycle unused bitmaps
-                if (bitmap != null) {
-                    bitmap.recycle();
-                }
-                stream = getActivity().getContentResolver().openInputStream(data.getData());
-                bitmap = BitmapFactory.decodeStream(stream);
-
-                // Making it square squashes the dimensions oddly. Source of error?
-                bitmap = Bitmap.createScaledBitmap(bitmap, 48, 48, false);
-
-                imageView.setImageBitmap(bitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            postJson(toGrayscale(bitmap));
-        }
     }
 
     public double[][] toGrayscale(Bitmap img) {
